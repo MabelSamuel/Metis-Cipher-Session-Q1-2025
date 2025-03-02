@@ -1,7 +1,7 @@
 interface ButtonProps {
   content: string;
   loading: boolean;
-  eventName: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  eventName?: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 const Button = ({ content, loading, eventName }: ButtonProps) => {
   return (
