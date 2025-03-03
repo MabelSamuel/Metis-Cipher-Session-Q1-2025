@@ -79,33 +79,32 @@ export const ContractProvider = ({ children }: { children: ReactNode }) => {
 
   async function getAdmins(contractInstance: ethers.Contract) {
     try {
-        let adminList: string[] = [];
-        let index = 0;
+      let adminList: string[] = [];
+      let index = 0;
 
-        while (true) {
-            try {
-                const adminAddress = await contractInstance.admins(index);
-                adminList.push(adminAddress);
-                index++;
-            } catch (error) {
-                break;
-            }
+      while (true) {
+        try {
+          const adminAddress = await contractInstance.admins(index);
+          adminList.push(adminAddress);
+          index++;
+        } catch (error) {
+          break;
         }
+      }
 
-        return adminList;
+      return adminList;
     } catch (error) {
-        console.error("Error fetching admins:", error);
-        return [];
+      console.error("Error fetching admins:", error);
+      return [];
     }
-}
-
+  }
 
   async function checkAdmin(
     contractInstance: ethers.Contract,
     userAddress: string
   ) {
     const adminList = await getAdmins(contractInstance);
-    setIsAdmin(adminList.includes(userAddress)); 
+    setIsAdmin(adminList.includes(userAddress));
   }
 
   async function fetchElectionStatus(contractInstance: ethers.Contract) {

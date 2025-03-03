@@ -1,12 +1,11 @@
 import { useNavigate } from "react-router";
 import { useContract } from "../../context/ContractContext";
-import AddressTag from "../ui/AddressTag";
 import Button from "../ui/Button";
 
 const HeroSection = () => {
   const { connectWallet, loading, account } = useContract();
   const navigate = useNavigate();
-  const goToRegister = () =>{
+  const goToRegister = ():void =>{
     navigate("register");
   }
 
@@ -21,10 +20,7 @@ const HeroSection = () => {
           Empowering Democracy with Decentralized Voting.
         </p>
         {account ? (
-          <div className="flex space-x-7">
-            <AddressTag variant="neutral" />
             <Button loading={false} variant="neutral" content="Register to vote" eventName={goToRegister} />
-          </div>
         ) : (
           <Button
             eventName={connectWallet}
