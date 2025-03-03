@@ -1,5 +1,8 @@
 import { Link, NavLink } from "react-router";
-import Button from "./Button";
+import { TiTick } from "react-icons/ti";
+import Button from "../ui/Button";
+import { useContract } from "../../context/ContractContext";
+import AddressTag from "../ui/AddressTag";
 
 const Navbar = () => {
   const menu = [
@@ -9,24 +12,26 @@ const Navbar = () => {
     { title: "How to vote", link: "/how-to-vote" },
   ];
 
+  const { connectWallet, loading, account } = useContract();
   return (
-    <nav className="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
+    <nav className="bg-white dark:bg-gray-900 sticky w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        <Link
-          to="/"
-          className="flex items-center space-x-3 rtl:space-x-reverse"
-        >
-          <img
-            src="https://flowbite.com/docs/images/logo.svg"
-            className="h-8"
-            alt="Flowbite Logo"
-          />
+        <Link to="/" className="flex items-center rtl:space-x-reverse">
+          <TiTick className="size-10 text-blue-700" />
           <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
             Electra
           </span>
         </Link>
         <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-          <Button content="Connect Wallet" loading={false}/>
+          {account ? (
+            <AddressTag />
+          ) : (
+            <Button
+              content="Connect Wallet"
+              eventName={connectWallet}
+              loading={loading}
+            />
+          )}
           <button
             data-collapse-toggle="navbar-sticky"
             type="button"
@@ -44,9 +49,9 @@ const Navbar = () => {
             >
               <path
                 stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
                 d="M1 1h15M1 7h15M1 13h15"
               />
             </svg>

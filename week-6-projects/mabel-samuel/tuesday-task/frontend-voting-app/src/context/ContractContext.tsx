@@ -1,4 +1,4 @@
-import { createContext, ReactNode } from "react";
+import { createContext, ReactNode, useContext } from "react";
 import { useState, useEffect } from "react";
 import { ethers, Eip1193Provider } from "ethers";
 import contractABI from "../abi/abi.json";
@@ -55,6 +55,7 @@ export const ContractProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
     try {
+      setLoading(true);
       await window.ethereum.request({ method: "eth_requestAccounts" });
       const provider = new ethers.BrowserProvider(window.ethereum);
       const user = await provider.getSigner();
@@ -73,16 +74,38 @@ export const ContractProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error("Error connecting to MetaMask:", error);
     }
+    setLoading(false);
   }
+
+  async function getAdmins(contractInstance: ethers.Contract) {
+    try {
+        let adminList: string[] = [];
+        let index = 0;
+
+        while (true) {
+            try {
+                const adminAddress = await contractInstance.admins(index);
+                adminList.push(adminAddress);
+                index++;
+            } catch (error) {
+                break;
+            }
+        }
+
+        return adminList;
+    } catch (error) {
+        console.error("Error fetching admins:", error);
+        return [];
+    }
+}
+
 
   async function checkAdmin(
     contractInstance: ethers.Contract,
     userAddress: string
   ) {
-    if (contract) {
-      const adminsList = await contractInstance.admins();
-      setIsAdmin(adminsList.includes(userAddress));
-    }
+    const adminList = await getAdmins(contractInstance);
+    setIsAdmin(adminList.includes(userAddress)); 
   }
 
   async function fetchElectionStatus(contractInstance: ethers.Contract) {
@@ -167,4 +190,12 @@ export const ContractProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </ContractContext.Provider>
   );
+};
+
+export const useContract = (): ContractContextType => {
+  const context = useContext(ContractContext);
+  if (!context) {
+    throw new Error("useContract must be used within a ContractProvider");
+  }
+  return context;
 };
