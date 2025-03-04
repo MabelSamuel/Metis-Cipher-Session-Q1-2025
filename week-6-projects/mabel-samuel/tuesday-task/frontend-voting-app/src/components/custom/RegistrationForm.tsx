@@ -1,22 +1,45 @@
 import { TiTick } from "react-icons/ti";
-import Input from "../ui/Input"
+import Input from "../ui/Input";
 import SelectTag from "../ui/SelectTag";
+import Button from "../ui/Button";
+import { useContract } from "../../context/ContractContext";
+import { AiOutlineWallet } from "react-icons/ai";
 
 const RegistrationForm = () => {
+  const { connectWallet, account, loading } = useContract();
+  
   return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="border border-gray-200 w-1/2 flex flex-col items-center py-8 space-y-4 rounded-lg px-8">
-        <div className="size-16 bg-blue-700 rounded-full flex justify-center items-center">
-          <TiTick className="size-10 text-white" />
-        </div>
-        <h2 className="font-medium text-2xl">Register to vote</h2>
-        <form className="w-full space-y-4">
+    <div className="flex items-center justify-center min-h-screen">
+      {account ? (
+        <div className="border border-gray-200 w-1/2 flex flex-col items-center py-8 space-y-4 rounded-lg px-8 shadow-md">
+          <div className="size-16 bg-blue-700 rounded-full flex justify-center items-center">
+            <TiTick className="size-10 text-white" />
+          </div>
+          <h2 className="font-medium text-2xl">Register to vote</h2>
+          <form className="w-full space-y-4">
             <Input type="text" placeholder="Enter your name*" id="name" />
-            <Input type="number" placeholder="Enter your age*" id="age"/>
-            <Input type="number" placeholder="Enter your National Identification Number*" id="nin"/>
+            <Input type="number" placeholder="Enter your age*" id="age" />
+            <Input
+              type="number"
+              placeholder="Enter your National Identification Number*"
+              id="nin"
+            />
             <SelectTag />
-        </form>
-      </div>
+            <Button content="Submit" loading={false} classes="w-full" />
+          </form>
+        </div>
+      ) : (
+        <div className="border border-gray-200 w-1/2 flex flex-col items-center py-8 space-y-4 rounded-lg px-8 shadow-md bg-white">
+          <AiOutlineWallet className="text-blue-700 w-16 h-16" />
+          <h2 className="text-2xl font-semibold text-gray-700">
+            Connect Your Wallet
+          </h2>
+          <p className="text-gray-500 text-center">
+            To register as a voter, you need to connect your crypto wallet.
+          </p>
+          <Button content="Connect Wallet" eventName={connectWallet} loading={loading} classes="w-full" />
+        </div>
+      )}
     </div>
   );
 };
