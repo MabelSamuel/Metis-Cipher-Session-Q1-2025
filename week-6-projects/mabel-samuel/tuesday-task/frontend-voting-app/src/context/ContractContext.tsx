@@ -2,6 +2,7 @@ import { createContext, ReactNode, useContext } from "react";
 import { useState, useEffect } from "react";
 import { ethers, Eip1193Provider } from "ethers";
 import contractABI from "../abi/abi.json";
+import { toast } from "react-toastify";
 
 declare global {
   interface Window {
@@ -21,6 +22,8 @@ interface ContractContextType {
   startElection: () => Promise<void>;
   endElection: () => Promise<void>;
   addAdmin: (newAdmin: string) => Promise<void>;
+  registerVoter: (name: string, age: number, nin: string, nationality: string) => Promise<void>;
+  registerContestant: (name: string, age: number, party: string, manifesto: string) => Promise<void>;
 }
 
 const ContractContext = createContext<ContractContextType | null>(null);
@@ -71,8 +74,10 @@ export const ContractProvider = ({ children }: { children: ReactNode }) => {
       fetchElectionStatus(contractInstance);
       fetchTotalVotes(contractInstance);
       fetchWinner(contractInstance);
+      toast.success("Wallet Connected!")
     } catch (error) {
       console.error("Error connecting to MetaMask:", error);
+      toast.error("Error Connecting")
     }
     setLoading(false);
   }
@@ -163,13 +168,54 @@ export const ContractProvider = ({ children }: { children: ReactNode }) => {
       try {
         const tx = await contract.addAdmin(newAdmin);
         await tx.wait();
-        alert("Admin added successfully");
+        toast.success("Admin added successfully!");
       } catch (error) {
         console.error("Error adding admin:", error);
+        toast.error("Error adding admin")
       }
       setLoading(false);
     }
   }
+
+  async function registerVoter(name: string, age: number, nin: string, nationality: string) {
+    if (!contract) {
+      toast.info("Wallet not connected!");
+      return;
+    }
+  
+    setLoading(true);
+    try {
+      const tx = await contract.registerVoter(account, name, age, nin, nationality);
+      toast.info("Registering Voter...");
+      await tx.wait();
+      toast.success("Voter Registered Successfully!");
+    } catch (error) {
+      console.error("Error registering voter:", error);
+      toast.error("Failed to register voter!");
+    }
+    setLoading(false);
+  }
+  
+  async function registerContestant(name: string, age: number, party: string, manifesto: string) {
+    if (!contract) {
+      toast.info("Wallet not connected!");
+      return;
+    }
+  
+    setLoading(true);
+    try {
+      const tx = await contract.registerContestant(account, name, age, party, manifesto);
+      toast.info("Registering Contestant...");
+      await tx.wait();
+      toast.success("Contestant Registered Successfully!");
+    } catch (error) {
+      console.error("Error registering contestant:", error);
+      toast.error("Failed to register contestant!");
+    }
+    setLoading(false);
+  }
+  
+
   return (
     <ContractContext.Provider
       value={{
@@ -184,6 +230,8 @@ export const ContractProvider = ({ children }: { children: ReactNode }) => {
         endElection,
         addAdmin,
         connectWallet,
+        registerVoter,
+        registerContestant
       }}
     >
       {children}

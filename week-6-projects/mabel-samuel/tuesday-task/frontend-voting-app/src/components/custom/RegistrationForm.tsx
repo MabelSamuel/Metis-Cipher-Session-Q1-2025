@@ -4,10 +4,34 @@ import SelectTag from "../ui/SelectTag";
 import Button from "../ui/Button";
 import { useContract } from "../../context/ContractContext";
 import { AiOutlineWallet } from "react-icons/ai";
+import React, { useState } from "react";
 
 const RegistrationForm = () => {
-  const { connectWallet, account, loading } = useContract();
-  
+  const [voterData, setVoterData] = useState({
+    name: "",
+    age: "",
+    nin: "",
+    nationality: "",
+  });
+  const { connectWallet, account, loading, registerVoter } = useContract();
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setVoterData({ ...voterData, [e.target.name]: e.target.value });
+  };
+
+  const handleVoterSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    registerVoter(
+      voterData.name,
+      parseInt(voterData.age),
+      voterData.nin,
+      voterData.nationality
+    );
+    setVoterData({ name: "", age: "", nin: "", nationality: "" });
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen">
       {account ? (
@@ -16,15 +40,26 @@ const RegistrationForm = () => {
             <TiTick className="size-10 text-white" />
           </div>
           <h2 className="font-medium text-2xl">Register to vote</h2>
-          <form className="w-full space-y-4">
-            <Input type="text" placeholder="Enter your name*" id="name" />
-            <Input type="number" placeholder="Enter your age*" id="age" />
+          <form className="w-full space-y-4" onSubmit={handleVoterSubmit}>
+            <Input
+              type="text"
+              placeholder="Enter your name*"
+              id="name"
+              onChange={handleInputChange}
+            />
+            <Input
+              type="number"
+              placeholder="Enter your age*"
+              id="age"
+              onChange={handleInputChange}
+            />
             <Input
               type="number"
               placeholder="Enter your National Identification Number*"
               id="nin"
+              onChange={handleInputChange}
             />
-            <SelectTag />
+            <SelectTag onChange={handleInputChange} />
             <Button content="Submit" loading={false} classes="w-full" />
           </form>
         </div>
@@ -37,7 +72,12 @@ const RegistrationForm = () => {
           <p className="text-gray-500 text-center">
             To register as a voter, you need to connect your crypto wallet.
           </p>
-          <Button content="Connect Wallet" eventName={connectWallet} loading={loading} classes="w-full" />
+          <Button
+            content="Connect Wallet"
+            eventName={connectWallet}
+            loading={loading}
+            classes="w-full"
+          />
         </div>
       )}
     </div>
